@@ -77,6 +77,9 @@ int main()
 
 	// Direction of movement of NPC
 	sf::Vector2f direction(0.1f, 0.2f);
+
+	// vertex array of lines
+	sf::VertexArray hitboxArray{ sf::LineStrip, 5 };
 	
 	// Start the game loop
 	while (window.isOpen())
@@ -103,6 +106,7 @@ int main()
 			direction.y *= -1;
 			move_to.y = 600 - npc.getAnimatedSprite().getGlobalBounds().height;
 		}
+
 		
 		npc.getAnimatedSprite().setPosition(move_to);
 
@@ -161,6 +165,24 @@ int main()
 			}
 		}
 
+#ifdef _DEBUG
+		hitboxArray[0].position = player.getAnimatedSprite().getPosition();
+
+		hitboxArray[1].position = sf::Vector2f{
+			player.getAnimatedSprite().getPosition().x + player.getAnimatedSprite().getGlobalBounds().width,
+			player.getAnimatedSprite().getPosition().y };
+
+		hitboxArray[2].position = sf::Vector2f{
+			player.getAnimatedSprite().getPosition().x + player.getAnimatedSprite().getGlobalBounds().width,
+			player.getAnimatedSprite().getPosition().y + player.getAnimatedSprite().getGlobalBounds().height };
+
+		hitboxArray[3].position = sf::Vector2f{
+			player.getAnimatedSprite().getPosition().x,
+			player.getAnimatedSprite().getPosition().y + player.getAnimatedSprite().getGlobalBounds().height };
+
+		hitboxArray[4].position = player.getAnimatedSprite().getPosition();
+#endif
+
 		// Handle input to Player
 		player.handleInput(input);
 
@@ -170,13 +192,26 @@ int main()
 		// Update the Player
 		npc.update();
 
+		
+
 		// Check for collisions
 		result = c2AABBtoAABB(aabb_player, aabb_npc);
 		cout << ((result != 0) ? ("Collision") : "") << endl;
 		if (result){
+
+#ifdef _DEBUG
+			for (int i = 0; i < 4; ++i)
+				hitboxArray[i].color = sf::Color::Red;
+#endif
+
 			player.getAnimatedSprite().setColor(sf::Color(255,0,0));
 		}
 		else {
+#ifdef _DEBUG
+			for (int i = 0; i < 4; ++i)
+				hitboxArray[i].color = sf::Color::Green;
+#endif
+
 			player.getAnimatedSprite().setColor(sf::Color(0, 255, 0));
 		}
 
@@ -188,6 +223,11 @@ int main()
 
 		// Draw the NPC's Current Animated Sprite
 		window.draw(npc.getAnimatedSprite());
+
+#ifdef _DEBUG
+		// Draw vertex array
+		window.draw(hitboxArray);
+#endif
 
 		// Update the window
 		window.display();
