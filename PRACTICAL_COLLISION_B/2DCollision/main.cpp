@@ -8,6 +8,7 @@
 #include <NPC.h>
 #include <Input.h>
 #include <Debug.h>
+#include "Capsule.h"
 
 using namespace std;
 
@@ -30,6 +31,10 @@ int main()
 		return EXIT_FAILURE;
 	}
 
+	sf::CircleShape m_capsuleCircle;
+	m_capsuleCircle.setFillColor(sf::Color::White);
+	m_capsuleCircle.setRadius(20.0f);
+
 	// Setup NPC's Default Animated Sprite
 	AnimatedSprite npc_animated_sprite(npc_texture);
 	npc_animated_sprite.addFrame(sf::IntRect(3, 3, 84, 84));
@@ -49,17 +54,17 @@ int main()
 	player_animated_sprite.addFrame(sf::IntRect(428, 3, 84, 84));
 
 	// Setup the NPC
-	GameObject &npc = NPC(npc_animated_sprite);
+	GameObject& npc = NPC(npc_animated_sprite);
 
 	// Setup the Player
-	GameObject &player = Player(player_animated_sprite);
+	GameObject& player = Player(player_animated_sprite);
 
 	//Setup NPC AABB
 	c2AABB aabb_npc;
 	aabb_npc.min = c2V(npc.getAnimatedSprite().getPosition().x, npc.getAnimatedSprite().getPosition().y);
 	aabb_npc.max = c2V(
 		npc.getAnimatedSprite().getPosition().x +
-		npc.getAnimatedSprite().getGlobalBounds().width, 
+		npc.getAnimatedSprite().getGlobalBounds().width,
 		npc.getAnimatedSprite().getPosition().y +
 		npc.getAnimatedSprite().getGlobalBounds().height);
 
@@ -80,6 +85,40 @@ int main()
 
 	// vertex array of lines
 	sf::VertexArray hitboxArray{ sf::LineStrip, 5 };
+
+	Capsule capsule{ sf::Vector2f{100.0f, 50.0f}, sf::Vector2f{100.0f, 100.0f}, 25 };
+
+	c2Capsule c2_capsule;
+	c2_capsule.a = c2v{ capsule.m_posA.x, capsule.m_posA.y };
+	c2_capsule.b = c2v{ capsule.m_posB.x, capsule.m_posB.y };
+	c2_capsule.r = capsule.m_radius;
+
+	VertexArray npc_triangle{ sf::Triangles, 3 };
+
+	c2Poly c2_polygon;
+	c2_polygon.count = 3;
+	c2_polygon.verts[0].x = 400;
+	c2_polygon.verts[0].y = 100;
+
+	c2_polygon.verts[1].x = 350;
+	c2_polygon.verts[1].y = 200;
+
+	c2_polygon.verts[2].x = 450;
+	c2_polygon.verts[2].y = 200;
+
+	npc_triangle[0].position = sf::Vector2f{ c2_polygon.verts[0].x, c2_polygon.verts[0].y };
+	npc_triangle[1].position = sf::Vector2f{ c2_polygon.verts[1].x, c2_polygon.verts[1].y };
+	npc_triangle[2].position = sf::Vector2f{ c2_polygon.verts[2].x, c2_polygon.verts[2].y };
+
+
+	c2Ray c2_ray;
+	c2_ray.p = c2v{ 450, 550 };
+	c2_ray.d = c2v{ 1, 0 };
+	c2_ray.t = 50.0f;
+
+	VertexArray npc_ray{ sf::Lines, 2 };
+	npc_ray[0].position = { sf::Vector2f{c2_ray.p.x, c2_ray.p.y} };
+	npc_ray[1].position = { sf::Vector2f{c2_ray.p.x + (c2_ray.t * c2_ray.d.x), c2_ray.p.y +(c2_ray.t * c2_ray.d.y)} };
 	
 	// Start the game loop
 	while (window.isOpen())
@@ -192,11 +231,18 @@ int main()
 		// Update the Player
 		npc.update();
 
-		
-
 		// Check for collisions
-		result = c2AABBtoAABB(aabb_player, aabb_npc);
+
+		if (c2AABBtoAABB(aabb_player, aabb_npc) 
+			|| c2AABBtoCapsule(aabb_player, c2_capsule)
+			|| c2AABBtoPoly(aabb_player, &c2_polygon, NULL) 
+			|| c2RaytoAABB(c2_ray, aabb_player, &c2Raycast()))
+			result = 1;
+		else
+			result = 0;
+
 		cout << ((result != 0) ? ("Collision") : "") << endl;
+
 		if (result){
 
 #ifdef _DEBUG
@@ -228,6 +274,12 @@ int main()
 		// Draw vertex array
 		window.draw(hitboxArray);
 #endif
+
+		capsule.draw(window);
+
+		window.draw(npc_triangle);
+
+		window.draw(npc_ray);
 
 		// Update the window
 		window.display();
