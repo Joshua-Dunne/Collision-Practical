@@ -101,14 +101,16 @@ int main()
 
 	c2Poly c2_polygon;
 	c2_polygon.count = 3;
-	c2_polygon.verts[0].x = 200;
-	c2_polygon.verts[0].y = 100;
+	c2_polygon.verts[0].x = 600;
+	c2_polygon.verts[0].y = 200;
 
-	c2_polygon.verts[1].x = 150;
-	c2_polygon.verts[1].y = 200;
+	c2_polygon.verts[1].x = 550;
+	c2_polygon.verts[1].y = 300;
 
-	c2_polygon.verts[2].x = 250;
-	c2_polygon.verts[2].y = 200;
+	c2_polygon.verts[2].x = 650;
+	c2_polygon.verts[2].y = 300;
+
+	c2MakePoly(&c2_polygon);
 
 	npc_triangle[0].position = sf::Vector2f{ c2_polygon.verts[0].x, c2_polygon.verts[0].y };
 	npc_triangle[1].position = sf::Vector2f{ c2_polygon.verts[1].x, c2_polygon.verts[1].y };
