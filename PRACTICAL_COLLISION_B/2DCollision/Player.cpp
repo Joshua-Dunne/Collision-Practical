@@ -19,11 +19,38 @@ Player::~Player()
 {
 }
 
+void Player::init()
+{
+	m_circle.setRadius(20.0f);
+	m_circle.setOrigin(m_circle.getRadius(), m_circle.getRadius());
+	m_circle.setPosition(-1000.0f, -1000.0f);
+	m_circle.setFillColor(sf::Color::White);
+
+	m_line.setPrimitiveType(sf::Lines);
+	m_line.append(sf::Vertex{ sf::Vector2f{0,0} });
+	m_line.append(sf::Vertex{ sf::Vector2f{10,10} });
+}
+
 AnimatedSprite& Player::getAnimatedSprite()
 {
 	int frame = m_animated_sprite.getCurrentFrame();
 	m_animated_sprite.setTextureRect(m_animated_sprite.getFrame(frame));
 	return m_animated_sprite;
+}
+
+sf::CircleShape& Player::getCircleShape()
+{
+	return m_circle;
+}
+
+sf::VertexArray& Player::getVertexArray()
+{
+	return m_line;
+}
+
+sf::Vector2f Player::getVertexPos(int t_pointNum)
+{
+	return m_line[t_pointNum].position;
 }
 
 void Player::handleInput(Input in)

@@ -19,6 +19,10 @@ NPC::~NPC()
 {
 }
 
+void NPC::init()
+{
+}
+
 AnimatedSprite& NPC::getAnimatedSprite()
 {
 	int frame = m_animated_sprite.getCurrentFrame();
@@ -57,4 +61,19 @@ void NPC::update()
 {
 	//std::cout << "Handle Update" << std::endl;
 	m_animated_sprite.update();
+}
+
+sf::CircleShape& NPC::getCircleShape()
+{
+	return m_circle;
+}
+
+sf::VertexArray& NPC::getVertexArray()
+{
+	return m_line;
+}
+
+sf::Vector2f NPC::getVertexPos(int t_pointNum)
+{
+	return m_line[1].position;
 }
