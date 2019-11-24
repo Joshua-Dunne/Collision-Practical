@@ -1,14 +1,15 @@
-#include <AnimatedSprite.h>
+#include "AnimatedSprite.h"
 
 AnimatedSprite::AnimatedSprite() 
 {
 	m_current_frame = 0;
 }
 
-AnimatedSprite::AnimatedSprite(const sf::Texture& t) : Sprite(t), m_current_frame(0), m_time(seconds(0.5f)) {}
+AnimatedSprite::AnimatedSprite(const sf::Texture& t) : Sprite(t), m_current_frame(0), m_time(seconds(2.0f)) {}
 
-AnimatedSprite::AnimatedSprite(const sf::Texture& t, const sf::IntRect& rect) : Sprite(t), m_current_frame(0), m_time(seconds(0.5f)) {
+AnimatedSprite::AnimatedSprite(const sf::Texture& t, const sf::IntRect& rect) : Sprite(t), m_current_frame(0), m_time(seconds(2.0f)) {
 	m_frames.push_back(rect);
+	Sprite::setTexture(t);
 }
 
 AnimatedSprite::~AnimatedSprite() {}
@@ -31,6 +32,7 @@ const IntRect& AnimatedSprite::getFrame(int n) {
 
 void AnimatedSprite::addFrame(IntRect& frame) {
 	m_frames.push_back(frame);
+	Sprite::setTextureRect(m_frames[m_current_frame]);
 }
 
 const int AnimatedSprite::getCurrentFrame() {
@@ -42,11 +44,18 @@ void AnimatedSprite::update(){
 		if (m_frames.size() > m_current_frame + 1)
 		{
 			m_current_frame++;
+			Sprite::setTextureRect(m_frames[m_current_frame]);
 		}
 		else {
 			m_current_frame = 0;
+			Sprite::setTextureRect(m_frames[m_current_frame]);
 		}
 		m_clock.restart();
 	}
+}
+
+void AnimatedSprite::reset()
+{
+	m_current_frame = 0;
 }
 

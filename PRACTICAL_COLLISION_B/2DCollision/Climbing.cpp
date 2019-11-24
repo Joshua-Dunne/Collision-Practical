@@ -1,18 +1,30 @@
-#include <Climbing.h>
-#include <Jumping.h>
-#include <Idle.h>
+#include "Climbing.h"
 
-#include <string>
-
-void Climbing::idle(PlayerFSM* a)
+Climbing::Climbing()
 {
-	std::cout << "Climbing -> Idle" << std::endl;
+}
+
+Climbing::~Climbing()
+{
+}
+
+void Climbing::idle(Animation* a)
+{
+	std::cout << "Climbing -> Idling" << std::endl;
 	a->setCurrent(new Idle());
 	delete this;
 }
-void Climbing::jumping(PlayerFSM* a)
+
+void Climbing::jumping(Animation* a)
 {
-	std::cout << "Climbing -> Jump" << std::endl;
+	std::cout << "Climbing -> Jumping" << std::endl;
 	a->setCurrent(new Jumping());
+	delete this;
+}
+
+void Climbing::walking(Animation* a)
+{
+	std::cout << "Climbing -> Walking" << std::endl;
+	a->setCurrent(new Walking());
 	delete this;
 }

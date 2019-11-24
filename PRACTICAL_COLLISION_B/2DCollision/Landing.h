@@ -2,13 +2,11 @@
 #include "State.h"
 #include "Animation.h"
 
-class Climbing : public State
+class Landing : public State
 {
 public:
-	Climbing();
-	~Climbing();
+	Landing();
+	~Landing();
 	void idle(Animation* a);
-	void jumping(Animation* a);
 	void walking(Animation* a);
 };
-

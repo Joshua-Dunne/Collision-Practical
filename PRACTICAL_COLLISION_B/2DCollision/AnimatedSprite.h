@@ -2,9 +2,10 @@
 #define ANIMATED_SPRITE_H
 
 #include <SFML\Graphics\Sprite.hpp>
+#include <SFML\Graphics.hpp>
 #include <SFML\System\Clock.hpp>
 #include <vector>
-#include <Debug.h>
+#include "Debug.h"
 
 using namespace std;
 using namespace sf;
@@ -23,12 +24,13 @@ public:
 	void addFrame(IntRect&);
 	const int getCurrentFrame();
 	void update();
+	void reset();
 	
 private:
 	Clock m_clock;
 	Time m_time;
 	vector<IntRect> m_frames;
-	unsigned int m_current_frame;
+	int m_current_frame;
 };
 
 #endif // !ANIMATED_SPRITE_H

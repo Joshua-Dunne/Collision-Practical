@@ -3,7 +3,7 @@
 
 #include <GameObject.h>
 #include <Input.h>
-#include <PlayerFSM.h>
+#include <Animation.h>
 #include <AnimatedSprite.h>
 
 class NPC : public GameObject
@@ -15,8 +15,10 @@ public:
 	void init();
 	NPC(const AnimatedSprite&);
 	AnimatedSprite& getAnimatedSprite();
-	void handleInput(Input);
+	AnimatedSprite* getAnimationSprite();
+	void handleInput(sf::Event t_event);
 	void update();
+	void drawAnim(sf::RenderWindow& t_window);
 	sf::CircleShape& getCircleShape();
 	sf::VertexArray& getVertexArray();
 	sf::Vector2f getVertexPos(int t_pointNum);

@@ -75,7 +75,7 @@ int main()
 	aabb_player.max = c2V(player.getAnimatedSprite().getGlobalBounds().width / 6, player.getAnimatedSprite().getGlobalBounds().width / 6);
 
 
-	enum ShapeState{AABB, Circle, Ray};
+	enum ShapeState{AABB, Circle, Ray, Control};
 	ShapeState m_currentShape{ AABB };
 
 	// Initialize Input
@@ -146,8 +146,21 @@ int main()
 	ray_player.p = c2v{ 0,0 };
 	ray_player.t = sqrt((pow(player.getVertexPos(1).x, 2) + pow(player.getVertexPos(1).y, 2)));
 	ray_player.d = c2v{ player.getVertexPos(1).x / ray_player.t, player.getVertexPos(1).y / ray_player.t };
+
+	c2AABB aabb_control;
+	aabb_control.min = c2V(player.getAnimationSprite()->getPosition().x, 
+						   player.getAnimationSprite()->getPosition().y);
+
+	aabb_control.max = c2V(
+		player.getAnimationSprite()->getPosition().x +
+		player.getAnimationSprite()->getGlobalBounds().width,
+		player.getAnimationSprite()->getPosition().y +
+		player.getAnimationSprite()->getGlobalBounds().height);
+
+	sf::VertexArray controlHitboxArray{ sf::LineStrip, 5 };
+
 	
-	//ray_player.d = 
+
 	
 	// Start the game loop
 	while (window.isOpen())
@@ -239,19 +252,8 @@ int main()
 				window.close();
 				break;
 			case sf::Event::KeyPressed:
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				{
-					input.setCurrent(Input::Action::LEFT);
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				{
-					input.setCurrent(Input::Action::RIGHT);
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-				{
-					input.setCurrent(Input::Action::UP);
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+				
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 				{
 					m_currentShape = AABB;
 					player.getCircleShape().setPosition(sf::Vector2f{ -1000.0f, -1000.0f });
@@ -270,11 +272,25 @@ int main()
 					m_currentShape = Ray;
 
 					player.getAnimatedSprite().setPosition(sf::Vector2f{ -1000.0f, -1000.0f });
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+				{
+					m_currentShape = Control;
+
 					player.getAnimatedSprite().setPosition(sf::Vector2f{ -1000.0f, -1000.0f });
 				}
+
+				if (m_currentShape == Control)
+				{
+					player.handleInput(event);
+				}
+
 				break;
 			default:
-				input.setCurrent(Input::Action::IDLE);
+				if (m_currentShape == Control)
+				{
+					player.handleInput(event);
+				}
 				break;
 			}
 		}
@@ -295,15 +311,29 @@ int main()
 			player.getAnimatedSprite().getPosition().y + player.getAnimatedSprite().getGlobalBounds().height };
 
 		hitboxArray[4].position = player.getAnimatedSprite().getPosition();
+
+
+		controlHitboxArray[0].position = player.getAnimationSprite()->getPosition();
+
+		controlHitboxArray[1].position = sf::Vector2f{
+			player.getAnimationSprite()->getPosition().x + player.getAnimationSprite()->getGlobalBounds().width,
+			player.getAnimationSprite()->getPosition().y };
+
+		controlHitboxArray[2].position = sf::Vector2f{
+			player.getAnimationSprite()->getPosition().x + player.getAnimationSprite()->getGlobalBounds().width,
+			player.getAnimationSprite()->getPosition().y + player.getAnimationSprite()->getGlobalBounds().height };
+
+		controlHitboxArray[3].position = sf::Vector2f{
+			player.getAnimationSprite()->getPosition().x,
+			player.getAnimationSprite()->getPosition().y + player.getAnimationSprite()->getGlobalBounds().height };
+
+		controlHitboxArray[4].position = player.getAnimationSprite()->getPosition();
 #endif
 
-		
-
-		
-		if (m_currentShape == AABB)
+		if (m_currentShape == AABB || m_currentShape == Control)
 		{
 			// Handle input to Player
-			player.handleInput(input);
+			player.handleInput(event);
 
 			// Update the Player
 			player.update();
@@ -328,6 +358,7 @@ int main()
 		else if (m_currentShape == Circle)
 		{
 			if (c2CircletoCircle(circle_player, c2_circle)
+				|| c2CircletoAABB(circle_player, aabb_npc)
 				|| c2RaytoCircle(c2_ray, circle_player, &c2Raycast())
 				|| c2CircletoCapsule(circle_player, c2_capsule)
 				|| c2CircletoPoly(circle_player, &c2_polygon, NULL))
@@ -345,23 +376,48 @@ int main()
 			else
 				result = 0;
 		}
+		else if (m_currentShape == Control)
+		{
+			if (c2AABBtoAABB(aabb_control, aabb_npc))
+				result = 1;
+			else
+				result = 0;
+		}
 
 #ifdef _DEBUG
 
 		cout << ((result != 0) ? ("Collision") : "") << endl;
 
-		if (result){
+		if (m_currentShape == AABB)
+		{
+			if (result) {
 
+				for (int i = 0; i < 5; ++i)
+					hitboxArray[i].color = sf::Color::Red;
+			}
+			else {
 
-			for (int i = 0; i < 4; ++i)
-				hitboxArray[i].color = sf::Color::Red;
+				for (int i = 0; i < 5; ++i)
+					hitboxArray[i].color = sf::Color::Green;
+
+			}
 		}
-		else {
 
-			for (int i = 0; i < 4; ++i)
-				hitboxArray[i].color = sf::Color::Green;
+		if (m_currentShape == Control)
+		{
+			if (result) {
 
+				for (int i = 0; i < 5; ++i)
+					controlHitboxArray[i].color = sf::Color::Red;
+			}
+			else {
+
+				for (int i = 0; i < 5; ++i)
+					controlHitboxArray[i].color = sf::Color::Green;
+
+			}
 		}
+		
 #endif
 
 		// Clear screen
@@ -374,13 +430,18 @@ int main()
 			window.draw(player.getCircleShape());
 		else if (m_currentShape == Ray)
 			window.draw(player.getVertexArray());
-
+		else if (m_currentShape == Control)
+			player.drawAnim(window);
+		
 		// Draw the NPC's Current Animated Sprite
 		window.draw(npc.getAnimatedSprite());
 
 #ifdef _DEBUG
 		// Draw vertex array
 		window.draw(hitboxArray);
+
+		if (m_currentShape == Control)
+		window.draw(controlHitboxArray);
 #endif
 
 		capsule.draw(window);

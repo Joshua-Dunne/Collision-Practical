@@ -5,14 +5,14 @@
 
 NPC::NPC() : GameObject()
 {
-	m_player_fsm.setCurrent(new Idle());
-	m_player_fsm.setPrevious(new Idle());
+	fsm.setCurrent(new Idle());
+	fsm.setPrevious(new Idle());
 }
 
 NPC::NPC(const AnimatedSprite& s) : GameObject(s)
 {
-	m_player_fsm.setCurrent(new Idle());
-	m_player_fsm.setPrevious(new Idle());
+	fsm.setCurrent(new Idle());
+	fsm.setPrevious(new Idle());
 }
 
 NPC::~NPC()
@@ -30,29 +30,39 @@ AnimatedSprite& NPC::getAnimatedSprite()
 	return m_animated_sprite;
 }
 
-void NPC::handleInput(Input in)
+AnimatedSprite* NPC::getAnimationSprite()
 {
-	DEBUG_MSG("Handle Input");
+	return nullptr;
+}
 
-	switch (in.getCurrent())
+void NPC::handleInput(sf::Event t_event)
+{
+	switch (t_event.type)
 	{
-	case Input::Action::IDLE:
-		//std::cout << "Player Idling" << std::endl;
-		m_player_fsm.idle();
-		break;
-	case Input::Action::UP:
-		//std::cout << "Player Up" << std::endl;
-		m_player_fsm.climbing();
-		break;
-	case Input::Action::LEFT:
-		//std::cout << "Player Left" << std::endl;
-		m_player_fsm.jumping();
-		break;
-	case Input::Action::RIGHT:
-		//std::cout << "Player Idling" << std::endl;
-		m_player_fsm.jumping();
-		break;
+	case sf::Event::KeyPressed:
+		//std::cout << "NPC Idling" << std::endl;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			fsm.walking();
+			break;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			fsm.climbing();
+			break;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			fsm.walking();
+			break;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+		{
+			fsm.jumping();
+			break;
+		}
 	default:
+		fsm.idle();
 		break;
 	}
 }
@@ -61,6 +71,10 @@ void NPC::update()
 {
 	//std::cout << "Handle Update" << std::endl;
 	m_animated_sprite.update();
+}
+
+void NPC::drawAnim(sf::RenderWindow& t_window)
+{
 }
 
 sf::CircleShape& NPC::getCircleShape()

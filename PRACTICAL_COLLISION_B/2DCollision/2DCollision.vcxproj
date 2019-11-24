@@ -20,31 +20,38 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.h" />
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Capsule.h" />
-    <ClInclude Include="PlayerFSM.h" />
     <ClInclude Include="Climbing.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="Falling.h" />
+    <ClInclude Include="Idle.h" />
+    <ClInclude Include="Jumping.h" />
+    <ClInclude Include="Landing.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="tinyc2.h" />
-    <ClInclude Include="Idle.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Jumping.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="State.h" />
+    <ClInclude Include="tinyc2.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Walking.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Capsule.cpp" />
-    <ClCompile Include="PlayerFSM.cpp" />
     <ClCompile Include="Climbing.cpp" />
+    <ClCompile Include="Falling.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Idle.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Jumping.cpp" />
+    <ClCompile Include="Landing.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="State.cpp" />
+    <ClCompile Include="Walking.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
